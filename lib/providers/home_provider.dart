@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
+import 'package:walking_app/hive_models/walk_step_model.dart';
 import 'package:walking_app/providers/hive_helper.dart';
 // import 'package:geolocator/geolocator.dart';
 
@@ -90,12 +91,22 @@ class HomeProvider extends ChangeNotifier {
 
   void addNewPath() {
     _pathModel = WalkPathModel(
-      steps: _pathEntity?.steps ?? [],
+      steps: (_pathEntity?.steps
+              .map(
+                (e) => WalkStepModel(
+                  coordinates: [e.coordinate.dx, e.coordinate.dy],
+                  heading: e.heading,
+                  timeStamp: e.timeStamp,
+                ),
+              )
+              .toList()) ??
+          [],
       interval: _pathEntity?.interval ?? 1,
       stepDistance: _pathEntity?.stepDistance ?? .5,
     );
 
     HiveHelper.instance.addWalkPath(_pathModel!);
+
     notifyListeners();
   }
 

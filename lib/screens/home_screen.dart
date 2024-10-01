@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:walking_app/utils/app_router.dart';
 import 'package:walking_app/utils/app_utils.dart';
-import 'package:walking_app/utils/extensions/extensions.dart';
 import 'package:walking_app/providers/home_provider.dart';
-import 'package:walking_app/screens/walk_cycle_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:provider/provider.dart';
@@ -112,39 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _buildConfigRow(provider),
             _buildActionsRow(provider),
-            /* Expanded(
-              child: provider.walkCycles.isEmpty
-                  ? const Center(
-                      child: Text('No data.'),
-                    )
-                  : ListView.separated(
-                      itemCount: provider.walkCycles.length,
-                      padding: const EdgeInsets.all(10),
-                      shrinkWrap: true,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return WalkCycleDetailScreen(
-                                    walk: provider.walkCycles[index],
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          title: Text('Walk ${index + 1}'),
-                          subtitle: Text(
-                            provider.walkCycles[index].iniT.formatted,
-                          ),
-                          trailing: const Icon(Icons.keyboard_arrow_right),
-                        );
-                      },
-                    ),
-            ), */
           ],
           // ],
         ),

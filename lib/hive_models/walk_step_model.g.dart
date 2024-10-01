@@ -1,38 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'walk_path_model.dart';
+part of 'walk_step_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class WalkPathModelAdapter extends TypeAdapter<WalkPathModel> {
+class WalkStepModelAdapter extends TypeAdapter<WalkStepModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 2;
 
   @override
-  WalkPathModel read(BinaryReader reader) {
+  WalkStepModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return WalkPathModel(
-      steps: (fields[0] as List).cast<WalkStepModel>(),
-      stepDistance: fields[1] as double,
-      interval: fields[2] as double,
+    return WalkStepModel(
+      coordinates: (fields[0] as List).cast<double>(),
+      heading: fields[1] as double,
+      timeStamp: fields[2] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, WalkPathModel obj) {
+  void write(BinaryWriter writer, WalkStepModel obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.steps)
+      ..write(obj.coordinates)
       ..writeByte(1)
-      ..write(obj.stepDistance)
+      ..write(obj.heading)
       ..writeByte(2)
-      ..write(obj.interval);
+      ..write(obj.timeStamp);
   }
 
   @override
@@ -41,7 +41,7 @@ class WalkPathModelAdapter extends TypeAdapter<WalkPathModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WalkPathModelAdapter &&
+      other is WalkStepModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -22,22 +22,43 @@ extension FormatExtension on double {
 }
 
 extension FormateExt on DateTime {
-  String get formatted {
-    final DateFormat format = DateFormat('HH:mm:ss (dd/MM/yyyy)');
-    return format.format(this);
-  }
+  String get formatted => DateFormat('HH:mm:ss (dd/MM/yyyy)').format(this);
 
-  String get dateF {
-    final DateFormat format = DateFormat('dd-MM-yyyy');
-    return format.format(this);
-  }
+  String get dateF => DateFormat('dd-MM-yyyy').format(this);
 
-  String get timeF {
-    final DateFormat format = DateFormat('HH:mm:ss');
-    return format.format(this);
-  }
+  String get mmYY => DateFormat.MMMEd().format(this);
+
+  String get timeF => DateFormat('HH:mm:ss').format(this);
 }
 
 extension FormatExtOffset on Offset {
   String get formatted => '(${dx.formatted}, ${dy.formatted})';
+}
+
+extension SnackBarExt on BuildContext {
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSuccess(
+      String msg) {
+    return ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(
+          msg,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showError(
+      String msg) {
+    return ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(
+          msg,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 }
