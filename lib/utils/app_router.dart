@@ -1,4 +1,3 @@
-import 'package:walking_app/entities/walk_path.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
 import 'package:walking_app/screens/history_screen.dart';
 import 'package:walking_app/screens/home_screen.dart';

@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:walking_app/entities/walk_path.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
 import 'package:walking_app/hive_models/walk_step_model.dart';
 
