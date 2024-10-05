@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:walking_app/utils/consts.dart';
+import 'package:walking_app/utils/app_consts.dart';
 import 'package:walking_app/utils/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 

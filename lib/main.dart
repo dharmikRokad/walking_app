@@ -1,6 +1,7 @@
 // Main app
 import 'package:walking_app/providers/hive_helper.dart';
 import 'package:walking_app/providers/home_provider.dart';
+import 'package:walking_app/providers/rive_helper.dart';
 import 'package:walking_app/utils/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => HomeProvider()),
+        ChangeNotifierProvider(create: (context) => RiveHelper()),
       ],
       child: MaterialApp(
         title: 'Walking App',

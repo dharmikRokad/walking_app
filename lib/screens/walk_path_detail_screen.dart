@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
+import 'package:walking_app/utils/app_utils.dart';
 import 'package:walking_app/utils/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
     fileName =
         'walk_path_${widget.walk.initT.dateF}_${widget.walk.initT.timeF}.csv';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await createExcelData();
+      await _createExcelData();
     });
   }
 
@@ -41,7 +42,9 @@ class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
-            onPressed: shareCsv,
+            onPressed: () {
+              AppUtils.shareCsv(XFile(csvFile.path));
+            },
             icon: const Icon(CupertinoIcons.share),
           ),
         ],
@@ -79,7 +82,7 @@ class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
     );
   }
 
-  Future<void> createExcelData() async {
+  Future<void> _createExcelData() async {
     for (final (i, step) in widget.walk.steps.indexed) {
       final List<String> record = [];
 
@@ -102,21 +105,5 @@ class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
 
     await csvFile.writeAsString(csvData);
     log('file ptah => ${csvFile.path}');
-  }
-
-  void shareCsv() async {
-    try {
-      final result = await Share.shareXFiles([XFile(csvFile.path)]);
-
-      if (!mounted) return;
-
-      if (result.status == ShareResultStatus.success) {
-        context.showSuccess('File sent.');
-      } else {
-        context.showError("file can't be shared");
-      }
-    } on Exception catch (e) {
-      log('err - sharing file => $e');
-    }
   }
 }

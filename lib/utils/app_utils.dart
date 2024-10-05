@@ -1,24 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AppUtils {
-  static Future<bool> checkActivityPermission() async {
-    // bool granted = await Permission.activityRecognition.isGranted;
-
-    // if (!granted) {
-    bool granted = await Permission.activityRecognition.request() ==
-        PermissionStatus.granted;
-    // }
-
-    return granted;
-  }
-
-  static double fromattedAngle(double angle) {
-    angle %= 360;
-    if (angle < 0) angle += 360;
-    return angle;
-  }
-
   // Matrix Functions ------------- //
   static List<List<double>> multiplyMatrix(
       List<List<double>> A, List<List<double>> B) {
@@ -134,4 +119,14 @@ class AppUtils {
   }
 
   // ---------------- //
+
+  // Export & share ---------------- //
+  static void shareCsv(XFile file) async {
+    try {
+      await Share.shareXFiles([file]);
+    } on Exception catch (e) {
+      log('err - sharing file => $e');
+    }
+  }
+  // ----------------------- //
 }

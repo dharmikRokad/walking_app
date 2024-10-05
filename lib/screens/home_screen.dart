@@ -6,7 +6,6 @@ import 'package:walking_app/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:provider/provider.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,10 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late StreamSubscription<UserAccelerometerEvent> _acceleroSubscription;
-  late StreamSubscription<GyroscopeEvent> _gyroSubscription;
-  late StreamSubscription<MagnetometerEvent> _magnetoSubscription;
-
   late final TextEditingController _stepDController;
   final FocusNode _sdfn = FocusNode(debugLabel: 'distance node');
   final FocusNode _stfn = FocusNode(debugLabel: 'interval node');
@@ -44,50 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<HomeProvider>().onCompassEvent,
       onError: (_) => AppUtils.showSensorErrorDialogue(context),
     );
-  }
-
-/* 
-  // Three sensors - accelero, gyro, megneto
-  void _activateSensers() {
-    _acceleroSubscription =
-        userAccelerometerEventStream(samplingPeriod: const Duration(seconds: 1))
-            .listen(
-      context.read<HomeProvider>().onAcceleometerEvent,
-      onError: (err) {
-        log(err.toString(), name: 'user accelero meter');
-        AppUtils.showSensorErrorDialogue(context);
-      },
-      cancelOnError: true,
-    );
-
-    _gyroSubscription =
-        gyroscopeEventStream(samplingPeriod: const Duration(milliseconds: 1000))
-            .listen(
-      context.read<HomeProvider>().onGyroscopeEvent,
-      onError: (err) {
-        log(err.toString(), name: 'gyro scope');
-        AppUtils.showSensorErrorDialogue(context);
-      },
-      cancelOnError: true,
-    );
-
-    _magnetoSubscription =
-        magnetometerEventStream(samplingPeriod: const Duration(seconds: 1))
-            .listen(
-      context.read<HomeProvider>().onMagnetometerEvent,
-      onError: (err) {
-        log(err.toString(), name: 'magneto meter');
-        AppUtils.showSensorErrorDialogue(context);
-      },
-      cancelOnError: true,
-    );
-  }
- */
-
-  void _disposeSubscriptions() {
-    _acceleroSubscription.cancel();
-    _gyroSubscription.cancel();
-    _magnetoSubscription.cancel();
   }
 
   @override
