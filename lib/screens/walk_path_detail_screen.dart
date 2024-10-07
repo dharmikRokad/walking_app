@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:csv/csv.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -60,6 +61,22 @@ class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
           Text(
             'Interval: ${widget.walk.interval} sec',
             style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 400,
+            child: LineChart(
+              LineChartData(
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: widget.walk.steps
+                        .map((e) => FlSpot(e.coordinates[0], e.coordinates[1]))
+                        .toList(),
+                  )
+                ],
+                backgroundColor: Colors.transparent,
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           Column(

@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:rive/rive.dart';
+import 'package:walking_app/providers/rive_helper.dart';
+import 'package:walking_app/utils/app_colors.dart';
 import 'package:walking_app/utils/app_router.dart';
 import 'package:walking_app/utils/app_utils.dart';
 import 'package:walking_app/providers/home_provider.dart';
@@ -25,8 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _stepDController = TextEditingController(
       text: context.read<HomeProvider>().stepDistance.toString(),
     );
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) async => initCompass());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await context.read<RiveHelper>().initWalkingMan();
+      await initCompass();
+    });
   }
 
   @override
@@ -43,143 +48,208 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeProvider>(builder: (context, provider, _) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Home'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(RouteNames.history.name);
-              },
-              icon: const Icon(Icons.history),
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            _buildConfigRow(provider),
-            _buildActionsRow(provider),
-          ],
-          // ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildConfigRow(HomeProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              focusNode: _sdfn,
-              controller: _stepDController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              decoration: InputDecoration(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                focusedBorder: const OutlineInputBorder(),
-                border: InputBorder.none,
-                labelText: 'Step distance (m)',
-                labelStyle: const TextStyle(fontSize: 18),
-                suffixIcon: _sdfn.hasFocus
-                    ? IconButton(
-                        icon: const Icon(Icons.done),
-                        onPressed: () {
-                          provider
-                              .changeStepD(double.parse(_stepDController.text));
-                          _sdfn.nextFocus();
-                        },
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: _sdfn.requestFocus,
+    return Consumer2<HomeProvider, RiveHelper>(
+      builder: (context, provider, rive, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xff917f7f),
+          appBar: AppBar(
+            title: const Text('Home'),
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(RouteNames.history.name);
+                },
+                icon: const Icon(Icons.history),
+              )
+            ],
+          ),
+          body: provider.isLoading || rive.walkmanArtboard == null
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Stack(
+                  children: [
+                    Rive(
+                      artboard: rive.walkmanArtboard!,
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.bottomCenter,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          // _buildActionsRow(provider),
+                          const SizedBox(height: 10),
+                          _buildstepdistanceVieW(provider),
+                          const SizedBox(height: 10),
+                          _buildIntervalView(provider),
+                          const SizedBox(height: 10),
+                          _buildActionButton(provider),
+                        ],
                       ),
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _buildstepdistanceVieW(HomeProvider provider) {
+    return TextField(
+      focusNode: _sdfn,
+      controller: _stepDController,
+      keyboardType: TextInputType.number,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: AppColors.headingTextColor,
+      ),
+      decoration: InputDecoration(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.lightTextColor),
+        ),
+        border: InputBorder.none,
+        labelText: 'Step distance (m)',
+        labelStyle: const TextStyle(
+          fontSize: 18,
+          color: AppColors.lightTextColor,
+        ),
+        suffixIcon: _sdfn.hasFocus
+            ? IconButton(
+                icon: const Icon(
+                  Icons.done,
+                  color: AppColors.lightTextColor,
+                ),
+                onPressed: () {
+                  provider.changeStepD(double.parse(_stepDController.text));
+                  _sdfn.nextFocus();
+                },
+              )
+            : IconButton(
+                icon: const Icon(
+                  Icons.edit,
+                  color: AppColors.lightTextColor,
+                ),
+                onPressed: _sdfn.requestFocus,
               ),
-            ),
-          ),
-          Expanded(
-            child: DropdownButtonFormField(
-              padding: const EdgeInsets.all(12),
-              focusNode: _stfn,
-              items: const [
-                DropdownMenuItem<int>(value: 1, child: Text('1')),
-                DropdownMenuItem<int>(value: 5, child: Text('5')),
-                DropdownMenuItem<int>(value: 15, child: Text('15')),
-                DropdownMenuItem<int>(value: 30, child: Text('30')),
-              ],
-              value: provider.deltaT,
-              onChanged: (value) {
-                provider.onDeltaTChanged(value);
-                _stfn.nextFocus();
-              },
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(),
-                labelText: 'Time interval (s)',
-              ),
-            ),
-          )
-        ],
       ),
     );
   }
 
-  Widget _buildActionsRow(HomeProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextButton(
-              onPressed: () {
-                if (!provider.isStartBtnEnable) return;
-
-                // _activateSensers();
-                provider
-                    .onStart(() => AppUtils.showSensorErrorDialogue(context));
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: provider.isStartBtnEnable
-                    ? Theme.of(context).colorScheme.inversePrimary
-                    : Colors.white,
-                foregroundColor: provider.isStartBtnEnable
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.inversePrimary,
-                elevation: 10,
-                fixedSize: const Size.fromHeight(50),
-              ),
-              child: const Text('Start'),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: TextButton(
-              onPressed: () {
-                if (provider.isStartBtnEnable) return;
-
-                provider.onStop();
-                // _disposeSubscriptions();
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: provider.isStartBtnEnable
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.inversePrimary,
-                foregroundColor: provider.isStartBtnEnable
-                    ? Theme.of(context).colorScheme.inversePrimary
-                    : Colors.white,
-                elevation: 100,
-                fixedSize: const Size.fromHeight(50),
-              ),
-              child: const Text('Stop'),
-            ),
-          )
-        ],
+  Widget _buildIntervalView(HomeProvider provider) {
+    return DropdownButtonFormField(
+      padding: const EdgeInsets.all(12),
+      focusNode: _stfn,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: AppColors.headingTextColor,
+      ),
+      iconEnabledColor: AppColors.lightTextColor,
+      items: const [
+        DropdownMenuItem<int>(value: 1, child: Text('1')),
+        DropdownMenuItem<int>(value: 5, child: Text('5')),
+        DropdownMenuItem<int>(value: 15, child: Text('15')),
+        DropdownMenuItem<int>(value: 30, child: Text('30')),
+      ],
+      value: provider.deltaT,
+      onChanged: (value) {
+        provider.onDeltaTChanged(value);
+        _stfn.nextFocus();
+      },
+      decoration: const InputDecoration(
+        border: InputBorder.none,
+        focusedBorder: OutlineInputBorder(),
+        labelText: 'Time interval (s)',
+        labelStyle: TextStyle(
+          fontSize: 18,
+          color: AppColors.lightTextColor,
+        ),
       ),
     );
   }
+
+  Widget _buildActionButton(HomeProvider provider) {
+    return InkWell(
+      onTap: provider.isStartBtnEnable
+          ? () {
+              if (!provider.isStartBtnEnable) return;
+              provider.onStart();
+              context.read<RiveHelper>().changeWalkSwitch();
+            }
+          : () {
+              if (provider.isStartBtnEnable) return;
+              context.read<RiveHelper>().changeWalkSwitch();
+              provider.onStop();
+            },
+      child: ClipOval(
+        child: Container(
+          height: 100,
+          width: 100,
+          alignment: Alignment.center,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          child: Text(provider.isStartBtnEnable ? 'Start' : 'Stop'),
+        ),
+      ),
+    );
+  }
+
+  /* Widget _buildActionsRow(HomeProvider provider) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              if (!provider.isStartBtnEnable) return;
+              provider.onStart();
+              context.read<RiveHelper>().changeWalkSwitch();
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: provider.isStartBtnEnable
+                  ? Theme.of(context).colorScheme.inversePrimary
+                  : Colors.white,
+              foregroundColor: provider.isStartBtnEnable
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.inversePrimary,
+              elevation: 10,
+              fixedSize: const Size.fromHeight(50),
+            ),
+            child: const Text('Start'),
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              context.read<RiveHelper>().changeWalkSwitch();
+              if (provider.isStartBtnEnable) return;
+
+              provider.onStop();
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: provider.isStartBtnEnable
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.inversePrimary,
+              foregroundColor: provider.isStartBtnEnable
+                  ? Theme.of(context).colorScheme.inversePrimary
+                  : Colors.white,
+              elevation: 100,
+              fixedSize: const Size.fromHeight(50),
+            ),
+            child: const Text('Stop'),
+          ),
+        )
+      ],
+    );
+  } */
 }

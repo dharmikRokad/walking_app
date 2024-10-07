@@ -20,7 +20,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => HomeProvider()),
-        ChangeNotifierProvider(create: (context) => RiveHelper()),
+        ChangeNotifierProvider(
+          create: (context) => RiveHelper(),
+        ),
       ],
       child: MaterialApp(
         title: 'Walking App',

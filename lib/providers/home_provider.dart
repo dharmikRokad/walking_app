@@ -74,7 +74,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onStart(VoidCallback onError) async {
+  void onStart() async {
     _pathEntity = WalkPath.init(
       heading: _heading!,
       interval: _deltaT.toDouble(),

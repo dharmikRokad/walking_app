@@ -7,9 +7,7 @@ import 'package:walking_app/utils/app_assets.dart';
 import 'package:walking_app/utils/app_consts.dart';
 
 class RiveHelper extends ChangeNotifier {
-  RiveHelper() {
-    initWalkingMan();
-  }
+  RiveHelper();
 
   late final StateMachineController? _walkingManStateCtrl;
   Artboard? _walkManArtboard;
@@ -21,6 +19,8 @@ class RiveHelper extends ChangeNotifier {
 
   Future<void> initWalkingMan() async {
     final data = await rootBundle.load(AnimationAssets.instance.walkingMan);
+
+    await RiveFile.initialize();
 
     final riveFile = RiveFile.import(data);
     final characterBoard = riveFile.mainArtboard;
@@ -42,8 +42,8 @@ class RiveHelper extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeWalkSwitch(bool value) {
-    _walkingSwitch.change(value);
+  void changeWalkSwitch() {
+    _walkingSwitch.fire();
     notifyListeners();
   }
 }
