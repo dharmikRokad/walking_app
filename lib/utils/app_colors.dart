@@ -8,4 +8,9 @@ class AppColors {
   static const Color darkRedBorderColor = Color(0xff3c0202);
   static const Color transparent = Colors.transparent;
   static const Color yellowAccent = Colors.yellowAccent;
+
+  static const Color primary = Color(0xffA02334);
+  static const Color secondary = Color(0xffFFAD60);
+  static const Color ternary = Color(0xffFFEEAD);
+  static const Color bg = Color(0xff96CEB4);
 }

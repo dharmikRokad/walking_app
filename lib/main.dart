@@ -31,19 +31,21 @@ class MyApp extends StatelessWidget {
         title: 'Walking App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
+          scaffoldBackgroundColor: AppColors.bg,
           appBarTheme: const AppBarTheme(
-            backgroundColor: AppColors.bgColor,
+            backgroundColor: AppColors.bg,
             titleTextStyle: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.darkRedBorderColor,
-              fontSize: 20,
+              color: AppColors.primary,
+              fontSize: 22,
             ),
-            iconTheme: IconThemeData(color: AppColors.darkRedBorderColor),
-            actionsIconTheme:
-                IconThemeData(color: AppColors.darkRedBorderColor),
-            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            iconTheme: IconThemeData(color: AppColors.primary),
+            actionsIconTheme: IconThemeData(color: AppColors.primary),
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarBrightness: Brightness.dark,
+              statusBarColor: Colors.transparent,
+            ),
           ),
           pageTransitionsTheme: const PageTransitionsTheme(
             builders: {

@@ -51,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer2<HomeProvider, RiveHelper>(
       builder: (context, provider, rive, _) {
         return Scaffold(
-          backgroundColor: AppColors.bgColor,
           appBar: AppBar(
             title: const Text('Home'),
             actions: [
@@ -80,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           // _buildActionsRow(provider),
                           const SizedBox(height: 10),
-                          _buildstepdistanceVieW(provider),
+                          _buildstepDistanceVieW(provider),
                           const SizedBox(height: 10),
                           _buildIntervalView(provider),
                           const SizedBox(height: 10),
@@ -95,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildstepdistanceVieW(HomeProvider provider) {
+  Widget _buildstepDistanceVieW(HomeProvider provider) {
     return TextField(
       focusNode: _sdfn,
       controller: _stepDController,
@@ -103,25 +102,25 @@ class _HomeScreenState extends State<HomeScreen> {
       style: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: AppColors.headingTextColor,
+        color: AppColors.primary,
       ),
       decoration: InputDecoration(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.lightTextColor),
+          borderSide: BorderSide(color: AppColors.ternary),
         ),
         border: InputBorder.none,
         labelText: 'Step distance (m)',
         labelStyle: const TextStyle(
           fontSize: 18,
-          color: AppColors.lightTextColor,
+          color: AppColors.ternary,
         ),
         suffixIcon: _sdfn.hasFocus
             ? IconButton(
                 icon: const Icon(
                   Icons.done,
-                  color: AppColors.lightTextColor,
+                  color: AppColors.ternary,
                 ),
                 onPressed: () {
                   provider.changeStepD(double.parse(_stepDController.text));
@@ -131,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : IconButton(
                 icon: const Icon(
                   Icons.edit,
-                  color: AppColors.lightTextColor,
+                  color: AppColors.ternary,
                 ),
                 onPressed: _sdfn.requestFocus,
               ),
