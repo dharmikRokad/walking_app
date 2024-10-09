@@ -13,6 +13,7 @@ class AnimationAssets with Assets {
   String get path => "${super.path}/animations";
 
   String get walkingMan => "$path/among_us_walking.riv";
+  String get walkingCrab => "$path/walking_crab.riv";
 }
 
 class ImageAssets with Assets {

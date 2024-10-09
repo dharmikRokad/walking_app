@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       text: context.read<HomeProvider>().stepDistance.toString(),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await context.read<RiveHelper>().initWalkingMan();
+      await context.read<RiveHelper>().initWalkingCrab();
       await initCompass();
     });
   }
@@ -62,14 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             ],
           ),
-          body: provider.isLoading || rive.walkmanArtboard == null
+          body: provider.isLoading || rive.walkCrabArtboard == null
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
               : Stack(
                   children: [
                     Rive(
-                      artboard: rive.walkmanArtboard!,
+                      artboard: rive.walkCrabArtboard!,
                       fit: BoxFit.fitWidth,
                       alignment: Alignment.bottomCenter,
                     ),
@@ -177,11 +177,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ? () {
               if (!provider.isStartBtnEnable) return;
               provider.onStart();
-              context.read<RiveHelper>().changeWalkSwitch();
+              context.read<RiveHelper>().changeCrabWalk(true);
+              context.read<RiveHelper>().changeCrabHandsJoint(true);
             }
           : () {
               if (provider.isStartBtnEnable) return;
-              context.read<RiveHelper>().changeWalkSwitch();
+              context.read<RiveHelper>().changeCrabWalk(false);
+              context.read<RiveHelper>().changeCrabHandsJoint(false);
               provider.onStop();
             },
       child: ClipOval(
