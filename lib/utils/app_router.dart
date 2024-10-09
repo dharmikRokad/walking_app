@@ -21,7 +21,7 @@ class AppRouter {
     return {
       RouteNames.home.name: (context) => const HomeScreen(),
       RouteNames.history.name: (context) => const HistoryScreen(),
-      RouteNames.walkDetail.name: (context) => WalkPathDetailScreen(
+      RouteNames.walkDetail.name: (context) => WalkDetailScreen(
           walk: (ModalRoute.of(context)?.settings.arguments) as WalkPathModel),
     };
   }

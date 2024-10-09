@@ -1,126 +1,183 @@
-import 'dart:developer';
-import 'dart:io';
-import 'package:csv/csv.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
-import 'package:walking_app/utils/app_utils.dart';
+import 'package:walking_app/providers/walk_details_scr_provider.dart';
+import 'package:walking_app/utils/app_colors.dart';
 import 'package:walking_app/utils/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 
-class WalkPathDetailScreen extends StatefulWidget {
-  const WalkPathDetailScreen({super.key, required this.walk});
+class WalkDetailScreen extends StatelessWidget {
+  const WalkDetailScreen({super.key, required this.walk});
 
   final WalkPathModel walk;
 
   @override
-  State<WalkPathDetailScreen> createState() => _WalkPathDetailScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => WalkDetailsScrProvider(walk: walk),
+      child: const WalkDetailWidget(),
+    );
+  }
 }
 
-class _WalkPathDetailScreenState extends State<WalkPathDetailScreen> {
-  final List<String> headers = ['No', 'Heading', 'Time', 'X', 'Y'];
-  late String fileName;
-  late File csvFile;
-  final List<List<dynamic>> data = [];
+class WalkDetailWidget extends StatefulWidget {
+  const WalkDetailWidget({super.key});
 
+  @override
+  State<WalkDetailWidget> createState() => _WalkDetailWidgetState();
+}
+
+class _WalkDetailWidgetState extends State<WalkDetailWidget> {
   @override
   void initState() {
     super.initState();
-    fileName =
-        'walk_path_${widget.walk.initT.dateF}_${widget.walk.initT.timeF}.csv';
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _createExcelData();
-    });
+    context.read<WalkDetailsScrProvider>().prepareDataToExport();
+  }
+
+  @override
+  void dispose() {
+    context.read<WalkDetailsScrProvider>().dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Walk details'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            onPressed: () {
-              AppUtils.shareCsv(XFile(csvFile.path));
-            },
-            icon: const Icon(CupertinoIcons.share),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        children: [
-          Text(
-            widget.walk.initT.timeF,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            'Interval: ${widget.walk.interval} sec',
-            style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 400,
-            child: LineChart(
-              LineChartData(
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: widget.walk.steps
-                        .map((e) => FlSpot(e.coordinates[0], e.coordinates[1]))
-                        .toList(),
-                  )
-                ],
-                backgroundColor: Colors.transparent,
+    return Consumer<WalkDetailsScrProvider>(builder: (context, provider, _) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Walk details'),
+          actions: [
+            IconButton(
+              onPressed: provider.shareCsv,
+              icon: const Icon(CupertinoIcons.share),
+            ),
+            IconButton(
+              onPressed: provider.changeView,
+              icon: Icon(
+                provider.isChartView
+                    ? Icons.table_chart_rounded
+                    : Icons.bar_chart_rounded,
               ),
             ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                provider.walk.initT.formatted,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                'Interval: ${provider.walk.interval} sec',
+                style: const TextStyle(
+                    fontWeight: FontWeight.normal, fontSize: 18),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: provider.isChartView
+                    ? _buildChartView(provider)
+                    : _buildDataView(provider),
+              )
+            ],
           ),
-          const SizedBox(height: 10),
-          Column(
-            children: widget.walk.steps.indexed.map(
-              (data) {
-                final (i, step) = data;
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  isThreeLine: true,
-                  title: Text(
-                    '${i + 1}). ${step.timeStamp.timeF} = ${step.strCords}',
-                  ),
-                  subtitle: Text('heading : ${step.heading}'),
-                );
-              },
-            ).toList(),
+        ),
+      );
+    });
+  }
+
+  Widget _buildChartView(WalkDetailsScrProvider provider) {
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: provider.walk.steps
+                .map((e) => FlSpot(e.coordinates[0], e.coordinates[1]))
+                .toList(),
           )
         ],
+        lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData(
+          getTooltipItems: (touchedSpots) {
+            return touchedSpots
+                .map(
+                  (e) => LineTooltipItem(
+                    '${e.x}, ${e.y}',
+                    const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.headingTextColor,
+                    ),
+                  ),
+                )
+                .toList();
+          },
+        )),
+        titlesData: const FlTitlesData(show: false),
+        backgroundColor: Colors.transparent,
       ),
     );
   }
 
-  Future<void> _createExcelData() async {
-    for (final (i, step) in widget.walk.steps.indexed) {
-      final List<String> record = [];
+  Widget _buildDataView(WalkDetailsScrProvider provider) {
+    return Table(
+      border: TableBorder.all(),
+      columnWidths: const {
+        0: FractionColumnWidth(0.1),
+        1: FlexColumnWidth(),
+        2: FlexColumnWidth(),
+        3: FlexColumnWidth(),
+        4: FlexColumnWidth(),
+      },
+      children: [
+        TableRow(
+          decoration: const BoxDecoration(color: AppColors.headingTextColor),
+          children: [
+            _tableCell('No.'),
+            _tableCell('X'),
+            _tableCell('Y'),
+            _tableCell('Heading'),
+            _tableCell('Time'),
+          ],
+        ),
+        ...provider.excelData.map(
+          (row) => TableRow(
+            children: row.indexed
+                .map(
+                  (cell) => TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      color: cell.$1 == 0
+                          ? AppColors.lightTextColor
+                          : cell.$1 == 1 || cell.$1 == 2
+                              ? AppColors.yellowAccent
+                              : AppColors.transparent,
+                      height: 40,
+                      alignment: Alignment.center,
+                      child: Text(cell.$2),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        )
+      ],
+    );
+  }
 
-      record.add((i + 1).toString());
-      record.add(step.heading.formatted);
-      record.add(step.timeStamp.formatted);
-      record.add(step.x.formatted);
-      record.add(step.y.formatted);
-
-      data.add(record);
-    }
-
-    String csvData = const ListToCsvConverter().convert([headers, ...data]);
-
-    final directory = await getApplicationDocumentsDirectory();
-
-    final path = "${directory.path}/$fileName";
-
-    csvFile = File(path);
-
-    await csvFile.writeAsString(csvData);
-    log('file ptah => ${csvFile.path}');
+  _tableCell(String value) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: Container(
+        padding: const EdgeInsets.all(2),
+        height: 40,
+        alignment: Alignment.center,
+        child: Text(value),
+      ),
+    );
   }
 }

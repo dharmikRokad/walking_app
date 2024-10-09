@@ -56,8 +56,8 @@ mixin HeadingAndCoordinateCalculation {
     double stepDistance,
     double headingDiff,
   ) {
-    double dx = stepDistance * math.sin(headingDiff.toRadian);
-    double dy = stepDistance * math.cos(headingDiff.toRadian);
+    double dx = stepDistance * math.sin(headingDiff.toRadian).roundToDouble();
+    double dy = stepDistance * math.cos(headingDiff.toRadian).roundToDouble();
 
     return Offset(lastCoordinate.dx + dx, lastCoordinate.dy + dy);
   }

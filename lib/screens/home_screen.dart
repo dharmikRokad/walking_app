@@ -51,10 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer2<HomeProvider, RiveHelper>(
       builder: (context, provider, rive, _) {
         return Scaffold(
-          backgroundColor: const Color(0xff917f7f),
+          backgroundColor: AppColors.bgColor,
           appBar: AppBar(
             title: const Text('Home'),
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             actions: [
               IconButton(
                 onPressed: () {
@@ -203,53 +202,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  /* Widget _buildActionsRow(HomeProvider provider) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextButton(
-            onPressed: () {
-              if (!provider.isStartBtnEnable) return;
-              provider.onStart();
-              context.read<RiveHelper>().changeWalkSwitch();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: provider.isStartBtnEnable
-                  ? Theme.of(context).colorScheme.inversePrimary
-                  : Colors.white,
-              foregroundColor: provider.isStartBtnEnable
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.inversePrimary,
-              elevation: 10,
-              fixedSize: const Size.fromHeight(50),
-            ),
-            child: const Text('Start'),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(
-          child: TextButton(
-            onPressed: () {
-              context.read<RiveHelper>().changeWalkSwitch();
-              if (provider.isStartBtnEnable) return;
-
-              provider.onStop();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: provider.isStartBtnEnable
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.inversePrimary,
-              foregroundColor: provider.isStartBtnEnable
-                  ? Theme.of(context).colorScheme.inversePrimary
-                  : Colors.white,
-              elevation: 100,
-              fixedSize: const Size.fromHeight(50),
-            ),
-            child: const Text('Stop'),
-          ),
-        )
-      ],
-    );
-  } */
 }

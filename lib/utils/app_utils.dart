@@ -121,7 +121,7 @@ class AppUtils {
   // ---------------- //
 
   // Export & share ---------------- //
-  static void shareCsv(XFile file) async {
+  static Future<void> shareFile(XFile file) async {
     try {
       await Share.shareXFiles([file]);
     } on Exception catch (e) {
