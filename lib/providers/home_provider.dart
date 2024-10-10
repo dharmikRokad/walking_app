@@ -18,9 +18,11 @@ class HomeProvider extends ChangeNotifier {
 
   double _stepDistance = .5;
 
-  int _deltaT = 1;
   WalkPathModel? _pathModel;
+
   WalkPath? _pathEntity;
+
+  final List<WalkPathModel> _recentWalks = [];
 
   bool get isLoading => _isLoading;
 
@@ -28,8 +30,9 @@ class HomeProvider extends ChangeNotifier {
 
   double get stepDistance => _stepDistance;
 
-  int get deltaT => _deltaT;
   WalkPathModel? get currentCycle => _pathModel;
+
+  List<WalkPathModel> get recentWalks => _recentWalks;
 
   bool get isStartBtnEnable => _calculationTimer == null;
 
@@ -48,11 +51,6 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onDeltaTChanged(int? value) {
-    _deltaT = value ?? 1;
-    notifyListeners();
-  }
-
   void addNewPath() {
     _pathModel = WalkPathModel(
       steps: (_pathEntity?.steps
@@ -65,23 +63,26 @@ class HomeProvider extends ChangeNotifier {
               )
               .toList()) ??
           [],
-      interval: _pathEntity?.interval ?? 1,
       stepDistance: _pathEntity?.stepDistance ?? .5,
     );
 
-    HiveHelper.instance.addWalkPath(_pathModel!);
+    if (_recentWalks.length == 4) {
+      _recentWalks.removeAt(0);
+    }
 
+    _recentWalks.add(_pathModel!);
+
+    HiveHelper.instance.addWalkPath(_pathModel!);
     notifyListeners();
   }
 
   void onStart() async {
     _pathEntity = WalkPath.init(
       heading: _heading!,
-      interval: _deltaT.toDouble(),
       stepDistance: _stepDistance,
     );
     _calculationTimer = Timer.periodic(
-      Duration(seconds: _deltaT),
+      const Duration(seconds: 1),
       (timer) async {
         if (_heading != null) {
           _pathEntity?.addStep(_heading!);

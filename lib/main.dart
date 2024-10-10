@@ -32,16 +32,16 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          scaffoldBackgroundColor: AppColors.bg,
+          indicatorColor: AppColors.color4,
           appBarTheme: const AppBarTheme(
-            backgroundColor: AppColors.bg,
+            elevation: 5,
+            shadowColor: AppColors.greyColor,
+            backgroundColor: AppColors.color4l,
             titleTextStyle: TextStyle(
+              color: AppColors.black87Color,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
               fontSize: 22,
             ),
-            iconTheme: IconThemeData(color: AppColors.primary),
-            actionsIconTheme: IconThemeData(color: AppColors.primary),
             systemOverlayStyle: SystemUiOverlayStyle(
               statusBarBrightness: Brightness.dark,
               statusBarColor: Colors.transparent,

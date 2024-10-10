@@ -9,6 +9,7 @@ class AppColors {
   static const Color transparent = Colors.transparent;
   static const Color yellowAccent = Colors.yellowAccent;
   static const Color greyColor = Colors.grey;
+  static const Color black87Color = Colors.black87;
 
   static const Color primary = Color(0xffA02334);
   static const Color secondary = Color(0xffFFAD60);

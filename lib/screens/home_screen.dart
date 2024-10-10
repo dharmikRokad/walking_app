@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rive/rive.dart';
+import 'package:walking_app/hive_models/walk_path_model.dart';
+import 'package:walking_app/providers/hive_helper.dart';
 import 'package:walking_app/providers/rive_helper.dart';
 import 'package:walking_app/utils/app_colors.dart';
 import 'package:walking_app/utils/app_router.dart';
@@ -9,6 +13,7 @@ import 'package:walking_app/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:provider/provider.dart';
+import 'package:walking_app/widgets/walk_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +25,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final TextEditingController _stepDController;
   final FocusNode _sdfn = FocusNode(debugLabel: 'distance node');
-  final FocusNode _stfn = FocusNode(debugLabel: 'interval node');
 
   @override
   void initState() {
@@ -53,44 +57,51 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Home'),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(RouteNames.history.name);
-                },
-                icon: const Icon(Icons.history),
-              )
-            ],
           ),
           body: provider.isLoading || rive.walkCrabArtboard == null
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : Stack(
-                  children: [
-                    Rive(
-                      artboard: rive.walkCrabArtboard!,
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.bottomCenter,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          // _buildActionsRow(provider),
-                          const SizedBox(height: 10),
-                          _buildstepDistanceVieW(provider),
-                          const SizedBox(height: 10),
-                          _buildIntervalView(provider),
-                          const SizedBox(height: 10),
-                          _buildActionButton(provider),
-                        ],
-                      ),
-                    ),
-                  ],
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+                  child: Column(
+                    children: [
+                      _buildAnimationView(provider, rive),
+                      const SizedBox(height: 5),
+                      const Divider(),
+                      Expanded(child: _buildRecentWalkVieW(provider)),
+                    ],
+                  ),
                 ),
         );
       },
+    );
+  }
+
+  Widget _buildAnimationView(HomeProvider provider, RiveHelper rive) {
+    return Container(
+      height: 300,
+      alignment: Alignment.center,
+      child: Stack(
+        children: [
+          Rive(
+            artboard: rive.walkCrabArtboard!,
+            fit: BoxFit.cover,
+            alignment: Alignment.bottomCenter,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            child: _buildstepDistanceVieW(provider),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: _buildActionButton(provider),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -102,25 +113,18 @@ class _HomeScreenState extends State<HomeScreen> {
       style: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: AppColors.primary,
       ),
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.ternary),
-        ),
         border: InputBorder.none,
         labelText: 'Step distance (m)',
         labelStyle: const TextStyle(
           fontSize: 18,
-          color: AppColors.ternary,
         ),
         suffixIcon: _sdfn.hasFocus
             ? IconButton(
                 icon: const Icon(
                   Icons.done,
-                  color: AppColors.ternary,
+                  color: AppColors.color4,
                 ),
                 onPressed: () {
                   provider.changeStepD(double.parse(_stepDController.text));
@@ -130,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : IconButton(
                 icon: const Icon(
                   Icons.edit,
-                  color: AppColors.ternary,
+                  color: AppColors.color4,
                 ),
                 onPressed: _sdfn.requestFocus,
               ),
@@ -138,42 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildIntervalView(HomeProvider provider) {
-    return DropdownButtonFormField(
-      padding: const EdgeInsets.all(12),
-      focusNode: _stfn,
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: AppColors.headingTextColor,
-      ),
-      iconEnabledColor: AppColors.lightTextColor,
-      items: const [
-        DropdownMenuItem<int>(value: 1, child: Text('1')),
-        DropdownMenuItem<int>(value: 5, child: Text('5')),
-        DropdownMenuItem<int>(value: 15, child: Text('15')),
-        DropdownMenuItem<int>(value: 30, child: Text('30')),
-      ],
-      value: provider.deltaT,
-      onChanged: (value) {
-        provider.onDeltaTChanged(value);
-        _stfn.nextFocus();
-      },
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-        focusedBorder: OutlineInputBorder(),
-        labelText: 'Time interval (s)',
-        labelStyle: TextStyle(
-          fontSize: 18,
-          color: AppColors.lightTextColor,
-        ),
-      ),
-    );
-  }
-
   Widget _buildActionButton(HomeProvider provider) {
-    return InkWell(
-      onTap: provider.isStartBtnEnable
+    return IconButton(
+      onPressed: provider.isStartBtnEnable
           ? () {
               if (!provider.isStartBtnEnable) return;
               provider.onStart();
@@ -186,21 +157,62 @@ class _HomeScreenState extends State<HomeScreen> {
               context.read<RiveHelper>().changeCrabHandsJoint(false);
               provider.onStop();
             },
-      child: ClipOval(
-        child: Container(
-          height: 100,
-          width: 100,
-          alignment: Alignment.center,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          child: Text(provider.isStartBtnEnable ? 'Start' : 'Stop'),
-        ),
+      iconSize: 40,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.color5,
+        foregroundColor: AppColors.color4,
+        elevation: 3,
+        shadowColor: AppColors.greyColor,
       ),
+      icon: Icon(
+        provider.isStartBtnEnable ? Icons.play_arrow : Icons.pause,
+      ),
+    );
+  }
+
+  Widget _buildRecentWalkVieW(HomeProvider provider) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Recent Walks',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.color4,
+              ),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(RouteNames.history.name);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.color4,
+              ),
+              child: const Row(
+                children: [Text('View All'), Icon(Icons.keyboard_arrow_right)],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: provider.recentWalks.isEmpty
+              ? const Center(child: Text('No recent walks.'))
+              : ListView.separated(
+                  itemCount: provider.recentWalks.length,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(bottom: 10),
+                  separatorBuilder: (_, __) => const SizedBox(height: 5),
+                  itemBuilder: (context, i) {
+                    return WalkTile(
+                      walk: provider.recentWalks.reversed.toList()[i],
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }

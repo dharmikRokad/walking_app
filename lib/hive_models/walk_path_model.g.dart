@@ -19,20 +19,17 @@ class WalkPathModelAdapter extends TypeAdapter<WalkPathModel> {
     return WalkPathModel(
       steps: (fields[0] as List).cast<WalkStepModel>(),
       stepDistance: fields[1] as double,
-      interval: fields[2] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, WalkPathModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.steps)
       ..writeByte(1)
-      ..write(obj.stepDistance)
-      ..writeByte(2)
-      ..write(obj.interval);
+      ..write(obj.stepDistance);
   }
 
   @override

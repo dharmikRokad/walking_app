@@ -11,13 +11,9 @@ class WalkPathModel extends HiveObject {
   @HiveField(1)
   final double stepDistance;
 
-  @HiveField(2)
-  final double interval;
-
   WalkPathModel({
     required this.steps,
     this.stepDistance = .5,
-    this.interval = 1,
   });
 
   DateTime get initT => steps.first.timeStamp;

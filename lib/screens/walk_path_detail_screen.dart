@@ -29,16 +29,12 @@ class WalkDetailWidget extends StatefulWidget {
 }
 
 class _WalkDetailWidgetState extends State<WalkDetailWidget> {
+  late WalkDetailsScrProvider provider;
+
   @override
   void initState() {
     super.initState();
     context.read<WalkDetailsScrProvider>().prepareDataToExport();
-  }
-
-  @override
-  void dispose() {
-    context.read<WalkDetailsScrProvider>().dispose();
-    super.dispose();
   }
 
   @override
@@ -72,12 +68,6 @@ class _WalkDetailWidgetState extends State<WalkDetailWidget> {
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
-              const SizedBox(height: 7),
-              Text(
-                'Interval: ${provider.walk.interval} sec',
-                style: const TextStyle(
-                    fontWeight: FontWeight.normal, fontSize: 18),
-              ),
               const SizedBox(height: 20),
               Expanded(
                 child: provider.isChartView
@@ -96,26 +86,29 @@ class _WalkDetailWidgetState extends State<WalkDetailWidget> {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
+            color: AppColors.color2,
             spots: provider.walk.steps
                 .map((e) => FlSpot(e.coordinates[0], e.coordinates[1]))
                 .toList(),
           )
         ],
-        lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData(
-          getTooltipItems: (touchedSpots) {
-            return touchedSpots
-                .map(
-                  (e) => LineTooltipItem(
-                    '${e.x}, ${e.y}',
-                    const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.headingTextColor,
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipItems: (touchedSpots) {
+              return touchedSpots
+                  .map(
+                    (e) => LineTooltipItem(
+                      '${e.x}, ${e.y}',
+                      const TextStyle(
+                        fontSize: 16,
+                        color: AppColors.headingTextColor,
+                      ),
                     ),
-                  ),
-                )
-                .toList();
-          },
-        )),
+                  )
+                  .toList();
+            },
+          ),
+        ),
         titlesData: const FlTitlesData(show: false),
         backgroundColor: Colors.transparent,
       ),
@@ -134,7 +127,7 @@ class _WalkDetailWidgetState extends State<WalkDetailWidget> {
       },
       children: [
         TableRow(
-          decoration: const BoxDecoration(color: AppColors.headingTextColor),
+          decoration: const BoxDecoration(color: AppColors.color1l),
           children: [
             _tableCell('No.'),
             _tableCell('X'),
@@ -152,9 +145,9 @@ class _WalkDetailWidgetState extends State<WalkDetailWidget> {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       color: cell.$1 == 0
-                          ? AppColors.lightTextColor
+                          ? AppColors.color1l
                           : cell.$1 == 1 || cell.$1 == 2
-                              ? AppColors.yellowAccent
+                              ? AppColors.color1
                               : AppColors.transparent,
                       height: 40,
                       alignment: Alignment.center,

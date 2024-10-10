@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
@@ -21,7 +22,7 @@ class WalkDetailsScrProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _excelData.clear();
+    log('WalkDetailScrProvider disposed!!');
     super.dispose();
   }
 

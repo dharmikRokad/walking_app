@@ -7,13 +7,11 @@ class WalkPath with HeadingAndCoordinateCalculation {
   WalkPath.init({
     required double heading,
     this.stepDistance = 1,
-    this.interval = 1,
   }) {
     addStep(heading);
   }
 
   final double stepDistance;
-  final double interval;
 
   List<WalkingStep> steps = [];
 
