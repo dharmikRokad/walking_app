@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
-import 'package:walking_app/providers/hive_helper.dart';
-import 'package:walking_app/utils/app_colors.dart';
-import 'package:walking_app/utils/app_router.dart';
-import 'package:walking_app/utils/extensions/extensions.dart';
+import 'package:walking_app/utils/app_consts.dart';
+import 'package:walking_app/utils/hive_helper.dart';
 import 'package:walking_app/widgets/walk_tile.dart';
 
-class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+class PreviousWalkScreen extends StatefulWidget {
+  const PreviousWalkScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  State<PreviousWalkScreen> createState() => _PreviousWalkScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class _PreviousWalkScreenState extends State<PreviousWalkScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
+        title: const Text(Strings.previousWalks),
       ),
       body: ValueListenableBuilder(
         valueListenable: HiveHelper.instance.walkPathBox.listenable(),
@@ -28,7 +26,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
           if (walks.isEmpty) {
             return const Center(
-              child: Text('NO data.'),
+              child: Text(Strings.noPreviousWalks),
             );
           }
 

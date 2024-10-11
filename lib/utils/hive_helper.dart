@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
 import 'package:walking_app/hive_models/walk_step_model.dart';
+import 'package:walking_app/utils/app_consts.dart';
 
 class HiveHelper {
   HiveHelper._();
@@ -11,7 +12,7 @@ class HiveHelper {
 
   static HiveHelper get instance => _instance;
 
-  final String _walkPathBoxName = 'walk_paths';
+  final String _walkPathBoxName = Consts.kWalkPathsBoxKey;
 
   Box<WalkPathModel> get walkPathBox =>
       Hive.box<WalkPathModel>(_walkPathBoxName);

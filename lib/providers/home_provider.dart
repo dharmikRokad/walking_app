@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
 import 'package:walking_app/hive_models/walk_step_model.dart';
-import 'package:walking_app/providers/hive_helper.dart';
+import 'package:walking_app/utils/app_consts.dart';
+import 'package:walking_app/utils/hive_helper.dart';
 
 class HomeProvider extends ChangeNotifier {
   HomeProvider();
@@ -16,7 +17,7 @@ class HomeProvider extends ChangeNotifier {
 
   double? _heading;
 
-  double _stepDistance = .5;
+  double _stepDistance = Consts.kStepDis;
 
   WalkPathModel? _pathModel;
 
@@ -56,14 +57,15 @@ class HomeProvider extends ChangeNotifier {
       steps: (_pathEntity?.steps
               .map(
                 (e) => WalkStepModel(
-                  coordinates: [e.coordinate.dx, e.coordinate.dy],
+                  coordinates: e.coordinate,
                   heading: e.heading,
                   timeStamp: e.timeStamp,
                 ),
               )
               .toList()) ??
           [],
-      stepDistance: _pathEntity?.stepDistance ?? .5,
+      stepDistance: _pathEntity?.stepDistance ?? _stepDistance,
+      travelledDistance: _pathEntity?.travelledDistance ?? 0,
     );
 
     if (_recentWalks.length == 4) {

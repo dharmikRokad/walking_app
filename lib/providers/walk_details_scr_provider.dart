@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:walking_app/hive_models/walk_path_model.dart';
+import 'package:walking_app/utils/app_consts.dart';
 import 'package:walking_app/utils/app_utils.dart';
 import 'package:walking_app/utils/extensions/extensions.dart';
 
@@ -19,12 +19,6 @@ class WalkDetailsScrProvider extends ChangeNotifier {
   WalkPathModel get walk => _walk;
   List<List<dynamic>> get excelData => _excelData;
   bool get isChartView => _isChartView;
-
-  @override
-  void dispose() {
-    log('WalkDetailScrProvider disposed!!');
-    super.dispose();
-  }
 
   void changeView() {
     _isChartView = !_isChartView;
@@ -46,11 +40,10 @@ class WalkDetailsScrProvider extends ChangeNotifier {
   }
 
   Future<String> createCsvFile() async {
-    final headers = ['No', 'X', 'Y', 'Heading', 'Time'];
-    final fileName = 'walk_path_${_walk.initT.dateF}_${_walk.initT.timeF}.csv';
+    final fileName = 'walk_path_${_walk.iniT.dateF}_${_walk.iniT.timeF}.csv';
 
-    String csvData =
-        const ListToCsvConverter().convert([headers, ..._excelData]);
+    String csvData = const ListToCsvConverter()
+        .convert([Consts.kTableHeadings, ..._excelData]);
 
     final directory = await getApplicationDocumentsDirectory();
 

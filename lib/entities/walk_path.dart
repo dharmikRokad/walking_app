@@ -1,22 +1,24 @@
 import 'dart:math' as math;
 import 'package:walking_app/utils/app_consts.dart';
 import 'package:walking_app/utils/extensions/extensions.dart';
-import 'package:flutter/material.dart';
 
 class WalkPath with HeadingAndCoordinateCalculation {
   WalkPath.init({
     required double heading,
-    this.stepDistance = 1,
+    this.stepDistance = Consts.kStepDis,
   }) {
     addStep(heading);
   }
 
   final double stepDistance;
+  double _travelledDistance = 0;
 
   List<WalkingStep> steps = [];
 
   DateTime get iniT => steps.first.timeStamp;
   DateTime get endT => steps.last.timeStamp;
+  double get travelledDistance => _travelledDistance;
+  Duration get totalTime => endT.difference(iniT);
 
   void addStep(double heading) {
     DateTime timeStamp = DateTime.now();
@@ -25,7 +27,7 @@ class WalkPath with HeadingAndCoordinateCalculation {
       steps.add(
         (
           heading: heading,
-          coordinate: const Offset(0, 0),
+          coordinate: [0, 0],
           timeStamp: timeStamp,
         ),
       );
@@ -44,19 +46,21 @@ class WalkPath with HeadingAndCoordinateCalculation {
       ),
     );
 
+    _travelledDistance += stepDistance;
+
     return;
   }
 }
 
 mixin HeadingAndCoordinateCalculation {
-  Offset calculateNextCoordinate(
-    Offset lastCoordinate,
+  List<double> calculateNextCoordinate(
+    List<double> lastCoordinate,
     double stepDistance,
     double headingDiff,
   ) {
     double dx = stepDistance * math.sin(headingDiff.toRadian).roundToDouble();
     double dy = stepDistance * math.cos(headingDiff.toRadian).roundToDouble();
 
-    return Offset(lastCoordinate.dx + dx, lastCoordinate.dy + dy);
+    return [lastCoordinate[0] + dx, lastCoordinate[1] + dy];
   }
 }

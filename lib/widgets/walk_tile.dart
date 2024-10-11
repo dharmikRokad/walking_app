@@ -25,22 +25,23 @@ class WalkTile extends StatelessWidget {
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: AppColors.yellow, width: 1.5),
         ),
-        tileColor: AppColors.color1,
+        tileColor: AppColors.yellow.withAlpha(220),
         title: Text(
-          walk.initT.dateF,
+          walk.iniT.dateF,
           style: const TextStyle(
-            color: AppColors.color4,
+            color: AppColors.brown,
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
-          walk.initT.formatted,
-          style: const TextStyle(color: AppColors.color4),
+          walk.iniT.timeF,
+          style: const TextStyle(color: AppColors.brown),
         ),
         trailing: const Icon(
           Icons.keyboard_arrow_right,
-          color: AppColors.color4,
+          color: AppColors.brown,
         ),
       ),
     );

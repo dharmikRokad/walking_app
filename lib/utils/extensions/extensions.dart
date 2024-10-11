@@ -10,6 +10,20 @@ extension FormatExtension on double {
     return toStringAsFixed(2);
   }
 
+  String get formattedMeter {
+    if (this >= 1000) {
+      return "${(this / 1000).toStringAsFixed(1)} km";
+    }
+    return "${toStringAsFixed(1)} m";
+  }
+
+  String get formattedSeconds {
+    if (this >= 1000) {
+      return "${(this / 1000).toStringAsFixed(1)} km";
+    }
+    return "${toStringAsFixed(1)} m";
+  }
+
   double get opposite {
     if (this == 0) {
       return 0;
@@ -31,8 +45,16 @@ extension FormateExt on DateTime {
   String get timeF => DateFormat('HH:mm:ss').format(this);
 }
 
-extension FormatExtOffset on Offset {
-  String get formatted => '(${dx.formatted}, ${dy.formatted})';
+extension FormateExtension on Duration {
+  String get formattedUnit {
+    if (inHours >= 1) {
+      return "$inHours h ${inMinutes.remainder(60)} m";
+    } else if (inMinutes >= 1) {
+      return "$inMinutes m ${inSeconds.remainder(60)} s";
+    } else {
+      return "$inSeconds s";
+    }
+  }
 }
 
 extension SnackBarExt on BuildContext {

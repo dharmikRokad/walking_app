@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:ui';
 
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rive/rive.dart';
-import 'package:walking_app/hive_models/walk_path_model.dart';
-import 'package:walking_app/providers/hive_helper.dart';
-import 'package:walking_app/providers/rive_helper.dart';
+import 'package:walking_app/providers/rive_anim_provider.dart';
 import 'package:walking_app/utils/app_colors.dart';
+import 'package:walking_app/utils/app_consts.dart';
 import 'package:walking_app/utils/app_router.dart';
 import 'package:walking_app/utils/app_utils.dart';
 import 'package:walking_app/providers/home_provider.dart';
@@ -24,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final TextEditingController _stepDController;
-  final FocusNode _sdfn = FocusNode(debugLabel: 'distance node');
+  final FocusNode _sdfn = FocusNode(debugLabel: Consts.kDistanceNodeKey);
 
   @override
   void initState() {
@@ -33,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       text: context.read<HomeProvider>().stepDistance.toString(),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await context.read<RiveHelper>().initWalkingCrab();
+      await context.read<RiveAnimProvider>().initWalkingCrab();
       await initCompass();
     });
   }
@@ -52,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<HomeProvider, RiveHelper>(
+    return Consumer2<HomeProvider, RiveAnimProvider>(
       builder: (context, provider, rive, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Home'),
+            title: const Text(Strings.home),
           ),
           body: provider.isLoading || rive.walkCrabArtboard == null
               ? const Center(
@@ -78,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildAnimationView(HomeProvider provider, RiveHelper rive) {
+  Widget _buildAnimationView(HomeProvider provider, RiveAnimProvider rive) {
     return Container(
       height: 300,
       alignment: Alignment.center,
@@ -116,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       decoration: InputDecoration(
         border: InputBorder.none,
-        labelText: 'Step distance (m)',
+        labelText: Strings.stepDistanceLbl,
         labelStyle: const TextStyle(
           fontSize: 18,
         ),
@@ -124,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? IconButton(
                 icon: const Icon(
                   Icons.done,
-                  color: AppColors.color4,
+                  color: AppColors.brown,
                 ),
                 onPressed: () {
                   provider.changeStepD(double.parse(_stepDController.text));
@@ -134,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : IconButton(
                 icon: const Icon(
                   Icons.edit,
-                  color: AppColors.color4,
+                  color: AppColors.brown,
                 ),
                 onPressed: _sdfn.requestFocus,
               ),
@@ -148,21 +145,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ? () {
               if (!provider.isStartBtnEnable) return;
               provider.onStart();
-              context.read<RiveHelper>().changeCrabWalk(true);
-              context.read<RiveHelper>().changeCrabHandsJoint(true);
+              context.read<RiveAnimProvider>().changeCrabWalk(true);
+              context.read<RiveAnimProvider>().changeCrabHandsJoint(true);
             }
           : () {
               if (provider.isStartBtnEnable) return;
-              context.read<RiveHelper>().changeCrabWalk(false);
-              context.read<RiveHelper>().changeCrabHandsJoint(false);
+              context.read<RiveAnimProvider>().changeCrabWalk(false);
+              context.read<RiveAnimProvider>().changeCrabHandsJoint(false);
               provider.onStop();
             },
       iconSize: 40,
       style: IconButton.styleFrom(
-        backgroundColor: AppColors.color5,
-        foregroundColor: AppColors.color4,
+        backgroundColor: AppColors.bg,
+        foregroundColor: AppColors.brown,
         elevation: 3,
-        shadowColor: AppColors.greyColor,
+        shadowColor: AppColors.grey,
       ),
       icon: Icon(
         provider.isStartBtnEnable ? Icons.play_arrow : Icons.pause,
@@ -175,35 +172,54 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            const Text(
-              'Recent Walks',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.color4,
+            const Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                Strings.recentWalks,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.brown,
+                ),
               ),
             ),
             const Spacer(),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(RouteNames.history.name);
+                Navigator.of(context).pushNamed(RouteNames.previousWalks.name);
               },
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.color4,
+                foregroundColor: AppColors.brown,
+                padding: const EdgeInsets.only(
+                  left: 10,
+                  right: 2,
+                ),
               ),
               child: const Row(
-                children: [Text('View All'), Icon(Icons.keyboard_arrow_right)],
+                children: [
+                  Text(Strings.previousWalks),
+                  Icon(Icons.keyboard_arrow_right)
+                ],
               ),
             ),
           ],
         ),
         Expanded(
           child: provider.recentWalks.isEmpty
-              ? const Center(child: Text('No recent walks.'))
+              ? const Center(
+                  child: Text(
+                    Strings.noRecentWalkMsg,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      height: 1.5,
+                    ),
+                  ),
+                )
               : ListView.separated(
                   itemCount: provider.recentWalks.length,
                   shrinkWrap: true,
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   separatorBuilder: (_, __) => const SizedBox(height: 5),
                   itemBuilder: (context, i) {
                     return WalkTile(

@@ -1,8 +1,8 @@
 // Main app
 import 'package:flutter/services.dart';
-import 'package:walking_app/providers/hive_helper.dart';
+import 'package:walking_app/utils/hive_helper.dart';
 import 'package:walking_app/providers/home_provider.dart';
-import 'package:walking_app/providers/rive_helper.dart';
+import 'package:walking_app/providers/rive_anim_provider.dart';
 import 'package:walking_app/utils/app_colors.dart';
 import 'package:walking_app/utils/app_router.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => HomeProvider()),
         ChangeNotifierProvider(
-          create: (context) => RiveHelper(),
+          create: (context) => RiveAnimProvider(),
         ),
       ],
       child: MaterialApp(
@@ -32,13 +32,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          indicatorColor: AppColors.color4,
+          indicatorColor: AppColors.brown,
           appBarTheme: const AppBarTheme(
             elevation: 5,
-            shadowColor: AppColors.greyColor,
-            backgroundColor: AppColors.color4l,
+            shadowColor: AppColors.grey,
+            backgroundColor: AppColors.lBrown,
             titleTextStyle: TextStyle(
-              color: AppColors.black87Color,
+              color: AppColors.black87,
               fontWeight: FontWeight.bold,
               fontSize: 22,
             ),

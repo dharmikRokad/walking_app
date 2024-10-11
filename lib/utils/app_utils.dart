@@ -4,6 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class AppUtils {
+  static List<double> getMinMaxXY(List<List<double>> points) {
+    if (points.isEmpty) {
+      throw ArgumentError('The list of points is empty');
+    }
+
+    double minX = points.first[0];
+    double minY = points.first[1];
+    double maxX = points.first[0];
+    double maxY = points.first[1];
+
+    for (List<double> point in points) {
+      if (point[0] < minX) minX = point[0];
+      if (point[1] < minY) minY = point[1];
+      if (point[0] > maxX) maxX = point[0];
+      if (point[1] > maxY) maxY = point[1];
+    }
+
+    return [minX, minY, maxX, maxY];
+  }
+
   // Matrix Functions ------------- //
   static List<List<double>> multiplyMatrix(
       List<List<double>> A, List<List<double>> B) {
@@ -117,7 +137,6 @@ class AppUtils {
       },
     );
   }
-
   // ---------------- //
 
   // Export & share ---------------- //
